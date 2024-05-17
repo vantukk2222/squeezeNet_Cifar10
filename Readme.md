@@ -18,4 +18,4 @@ python manage.py runserver 8888
 
 website: http://127.0.0.1:8888/
 
-![Image](/django_project_LMS//image//Django.PNG)
+![Django](image/Django.PNG)
