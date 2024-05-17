@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cifar10 Classifier on SqueezeNet</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+      #preview {
+        display: none;
+        width: 256px;
+        height: 256px;
+        object-fit: cover;
+        border: 1px solid #ccc;
+        margin-top: 10px;
+      }
+      body {
+        align-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>SqueezeNet with CIFAR-10 Dataset</h1>
+    <h2>Upload an Image</h2>
+    <form id="upload-form" enctype="multipart/form-data">
+      <input
+        type="file"
+        name="file"
+        id="file-input"
+        accept="image/*"
+        required
+      />
+      <button type="submit">Detection</button>
+    </form>
+    <img id="preview" src="" alt="Uploaded Image Preview" />
+
+    <div id="result">
+      <h2>Classification Result</h2>
+    </div>
+
+    <script>
+      const csrftoken = getCookie("csrftoken");
+
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+          const cookies = document.cookie.split(";");
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === name + "=") {
+              cookieValue = decodeURIComponent(
+                cookie.substring(name.length + 1)
+              );
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+
+      $(document).ready(function () {
+        $("#upload-form").on("submit", function (e) {
+          e.preventDefault();
+
+          const fileInput = document.getElementById("file-input");
+          const previewImage = document.getElementById("preview");
+
+          const file = fileInput.files[0];
+          if (!file) {
+            alert("Please select an image file to upload.");
+            return;
+          }
+
+          const formData = new FormData(this);
+
+          $.ajax({
+            url: "",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            beforeSend: function (xhr) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            success: function (response) {
+              $("#result h2").text("Classification Result: " + response.result);
+              if (response.imageDataUrl) {
+                previewImage.src = response.imageDataUrl;
+                previewImage.style.display = "block";
+              }
+            },
+            error: function (response) {
+              $("#result h2").text("Error: " + response.statusText);
+            },
+          });
+        });
+
+        $("#file-input").on("change", function (event) {
+          const file = event.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              const previewImage = document.getElementById("preview");
+              previewImage.src = e.target.result;
+              previewImage.style.display = "block";
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
