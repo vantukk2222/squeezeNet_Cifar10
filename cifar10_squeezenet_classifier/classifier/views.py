@@ -22,7 +22,8 @@ model.load_weights(model_weights_path)
 def index(request):
     if request.method == 'POST' and 'file' in request.FILES:
         img = request.FILES['file']
-        img_name = default_storage.save(img.name, ContentFile(img.read()))
+        img_name = default_storage.save('image_detection/' + img.name, ContentFile(img.read()))
+        print("IMAGE PATH: ", img_name)
         img_path = default_storage.path(img_name)
 
         img = image.load_img(img_path, target_size=(32, 32))
